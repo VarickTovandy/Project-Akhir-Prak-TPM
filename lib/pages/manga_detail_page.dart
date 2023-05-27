@@ -109,10 +109,8 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                             Row(
                               children: [
                                 IconButton(
-                                  icon: Icon(
-                                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                                    color: isFavorite ? Colors.red : null,
-                                  ),
+                                  icon:
+                                    isFavorite ? Icon(Icons.favorite, color: Colors.red) : Icon(Icons.favorite_border, color: Colors.white),
                                   onPressed: toggleFavorite,
                                 ),
                               ],

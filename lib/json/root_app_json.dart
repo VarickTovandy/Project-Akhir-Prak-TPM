@@ -14,7 +14,7 @@ final List<Map<String, dynamic>> rootAppJson = [
     "text" : "Favorite",
   },
   {
-    "icon" : LineIcons.list,
-    "text" : "Other",
+    "icon" : LineIcons.user,
+    "text" : "Profile",
   }
 ];

@@ -7,6 +7,7 @@ import 'package:project_manga/pages/manga_page.dart';
 import 'package:project_manga/pages/favorite_manga_page.dart';
 import 'package:project_manga/pages/other_page.dart';
 
+
 class RootApp extends StatefulWidget {
   const RootApp({Key? key}) : super(key: key);
 

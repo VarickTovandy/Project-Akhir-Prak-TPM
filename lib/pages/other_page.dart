@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:project_manga/pages/profile_page.dart';
-import 'package:project_manga/pages/clock_page.dart';
-import 'package:project_manga/pages/currency_page.dart';
 import 'package:project_manga/pages/login_page.dart';
 
 void main() {
@@ -21,124 +18,94 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class OtherPage extends StatelessWidget {
+class OtherPage extends StatefulWidget {
+  @override
+  _OtherPageState createState() => _OtherPageState();
+}
+
+class _OtherPageState extends State<OtherPage> {
+  String username = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getUsername();
+  }
+
+  Future<void> getUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? 'Youkai';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
             padding: EdgeInsets.all(12.0),
-            child: Text(
-              'Other',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            color: Colors.grey.withOpacity(0.1),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Profile',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
           Expanded(
-            child: Container(
-              color: Colors.yellow,
-              child: ListView.builder(
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  if (index == 3) {
-                    return Column(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () async {
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                            await prefs.remove('username');
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(builder: (context) => LoginPage()),
-                                  (route) => false,
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
-                            ),
-                            primary: Colors.blue,
-                            elevation: 0,
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                            child: Text(
-                              _getPageTitle(index),
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 4.0),
-                      ],
-                    );
-                  }
-                  return Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (index == 0) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ProfilePage()),
-                            );
-                          } else if (index == 1) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ClockPage()),
-                            );
-                          } else if (index == 2) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => CurrencyConverterPage()),
-                            );
-                          } else if (index == 3) {
-                            Navigator.pushNamed(context, '/logout');
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey),
-                            ),
-                          ),
-                          child: Text(
-                            _getPageTitle(index),
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: NetworkImage(
+                      "https://i.pinimg.com/564x/a8/b5/30/a8b530d8936c9f5ff9fbc6ade1eb81c2.jpg",
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    username,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      await prefs.remove('username');
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                            (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
                       ),
-                      SizedBox(height: 4.0), // Add some spacing between items
-                    ],
-                  );
-                },
+                      primary: Color(0xFF0A3F67),
+                      elevation: 0,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  String _getPageTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'Profile';
-      case 1:
-        return 'Clock';
-      case 2:
-        return 'Currency Converter';
-      case 3:
-        return 'Logout';
-      default:
-        return '';
-    }
   }
 }

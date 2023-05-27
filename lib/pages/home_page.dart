@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:project_manga/pages/manga_detail_page.dart';
 
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List? mangaList;
+  String username = '';
 
   Future<void> fetchMangaData() async {
     final response = await http.get(Uri.parse("https://api.jikan.moe/v4/manga"));
@@ -23,6 +25,13 @@ class _HomePageState extends State<HomePage> {
         mangaList = data['data'];
       });
     }
+  }
+
+  Future<void> getUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? 'User';
+    });
   }
 
   @override
@@ -44,7 +53,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Hello, Youkai",
+                  "Hello, Otaku",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                 ),
                 CircleAvatar(

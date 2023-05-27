@@ -3,55 +3,39 @@ import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:project_manga/dbmodel/user.dart';
 import 'package:project_manga/main.dart';
-import 'package:project_manga/pages/register_page.dart';
+import 'package:project_manga/pages/home_page.dart';
+import 'package:project_manga/pages/login_page.dart';
 import 'package:project_manga/pages/root_app.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  late Box<UserModel> _myBox;
   late SharedPreferences prefs;
+  late Box<UserModel> _myBox;
 
   bool _isObscure = true;
 
   @override
   void initState() {
     super.initState();
-    checkIsLogin();
+    Initial();
     _myBox = Hive.box(boxName);
   }
 
-  void checkIsLogin() async {
+  void Initial() async {
     prefs = await SharedPreferences.getInstance();
-
-    bool? isLogin = (prefs.getString('username') != null) ? true : false;
-
-    if(isLogin && mounted){
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-        builder: (context) => RootApp(),
-      ),
-              (route) => false);
-    }
-  }
-
-  void _goToRegister() {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => RegisterPage(),
-      ),
-          (route) => false,);
   }
 
   @override
@@ -65,35 +49,31 @@ class _LoginPageState extends State<LoginPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
+  void _goToLogin() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => LoginPage(),
+      ),
+          (route) => false,);
+  }
 
-  void _login() async {
-
-      bool found = false;
+  Future<void> _register() async{
       final username = _usernameController.text.trim();
       final password = _passwordController.text.trim();
-      final hashedPassword = sha256.convert(utf8.encode(password)).toString();
-      found = checkLogin(username, hashedPassword);
 
-      if (!found) {
-        _showSnackbar('Username or Password is Wrong');
-        _isObscure = false;
-      } else {
-        await prefs.setString('username', username);
-        if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => RootApp(),
-            ),
-                (route) => false,
-          );
-        }
-        _showSnackbar('Login Success');
-        _isObscure = true;
-      }
+      final hashedPassword = sha256.convert(utf8.encode(password)).toString();
+      _myBox.add(UserModel(
+        username: username,
+        password: hashedPassword,
+      ));
+      _showSnackbar('Registration successful');
+      await prefs.remove("username");
+      _goToLogin();
   }
 
   @override
@@ -118,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 10),
-            const Text('Login',
+            const Text('Register',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 30,
@@ -199,18 +179,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    InkWell(
-                      onTap: _goToRegister, // Navigate to RegisterScreen
-                      child: const Text(
-                        "Register here",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
                     const SizedBox(
                       height: 30,
                     ),
@@ -221,9 +189,9 @@ class _LoginPageState extends State<LoginPage> {
                         height: 50,
                         child: Builder(builder: (context) {
                           return ElevatedButton(
-                            onPressed: _login,
+                            onPressed: _register,
                             child:
-                            const Text('Login', style: TextStyle(fontSize: 15)),
+                            const Text('Register', style: TextStyle(fontSize: 15)),
                             style: ElevatedButton.styleFrom(
                               primary: const Color(0xFF0A3F67),
                             ),
@@ -239,37 +207,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-  int getLength() {
-    return _myBox.length;
-  }
-
-  bool checkLogin(String username, String password) {
-    bool found = false;
-    for (int i = 0; i < getLength(); i++) {
-      if (username == _myBox.getAt(i)!.username &&
-          password == _myBox.getAt(i)!.password) {
-        ("Login Success");
-        found = true;
-        break;
-      } else {
-        found = false;
-      }
-    }
-
-    return found;
-  }
-
-  bool checkUsers(String username) {
-    bool found = false;
-    for (int i = 0; i < getLength(); i++) {
-      if (username == _myBox.getAt(i)!.username) {
-        found = true;
-        break;
-      } else {
-        found = false;
-      }
-    }
-    return found;
   }
 }
